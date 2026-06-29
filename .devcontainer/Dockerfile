@@ -19,6 +19,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
   unzip \
   curl \
   build-essential \
+  lazygit \
   && git clone --depth 1 --branch ${NVIM_VERSION} https://github.com/neovim/neovim /tmp/neovim \
   && cd /tmp/neovim \
   && make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=/usr/local \
@@ -40,7 +41,14 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
   git \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://opencode.ai/install | bash
+RUN curl -fsSL https://opencode.ai/install | bash \
+  && cp /root/.opencode/bin/opencode /usr/local/bin/opencode
+
+RUN LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*') \
+  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz" \
+  tar xf lazygit.tar.gz lazygit                                                                                                              \
+  sudo install lazygit /usr/local/bin/                                                                                                       \
+  rm -f lazygit lazygit.tar.gz
 
 # Copy built neovim from builder
 COPY --from=nvim-builder /usr/local/bin/nvim /usr/local/bin/nvim

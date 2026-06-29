@@ -6,12 +6,17 @@
   "features": {},
   "customizations": {
     "devpod": {
-      "prebuildRepository": "ghcr.io/v1xp/devpod.cli-uv"
+      "prebuildRepository": "ghcr.io/v1xp/devpod-cli-uv"
     }
   },
+  "containerEnv": {
+    "GPG_TTY": "/dev/pts/0",
+    "GPG_AGENT_INFO": "/home/vscode/.gnupg/S.gpg-agent:0:1"
+  },
   "mounts": [
-    "source=${localEnv:HOME}/.gnupg,target=/home/vscode/.gnupg,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/.gnupg,target=/home/vscode/.gnupg,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh-host,type=bind,consistency=cached,readonly"
   ],
-  "postCreateCommand": "uv --version",
+  "postCreateCommand": "git config --local --add safe.directory /workspaces/devpods-builds && git remote -v",
   "remoteUser": "vscode"
 }
