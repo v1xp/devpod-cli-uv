@@ -19,6 +19,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
   unzip \
   curl \
   build-essential \
+  systemtap-sdt-dev \
   && NVIM_TAG=$(curl -fsSL https://api.github.com/repos/neovim/neovim/releases/latest | grep '"tag_name"' | cut -d '"' -f 4) \
   && echo "Building Neovim $NVIM_TAG" \
   && git clone --depth 1 --branch "$NVIM_TAG" https://github.com/neovim/neovim /tmp/neovim \
