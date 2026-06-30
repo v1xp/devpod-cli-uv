@@ -90,4 +90,5 @@ RUN groupadd -f docker && usermod -aG docker vscode \
 
 USER vscode
 RUN git config --global user.name "vscode" && git config --global user.email "vscode@devcontainer.local"
+RUN nvim --headless +"set spelllang=en_us,pt_br" +qa 2>/dev/null || true
 ENV PATH="/home/vscode/.local/bin:${PATH}"
