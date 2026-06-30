@@ -41,6 +41,16 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
   curl \
   git \
   stow \
+  ca-certificates \
+  curl \
+  gnupg \
+  lsb-release \
+  && install -m 0755 -d /etc/apt/keyrings \
+  && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+  && chmod a+r /etc/apt/keyrings/docker.gpg \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list \
+  && apt-get update \
+  && apt-get -y install --no-install-recommends docker-ce-cli docker-compose-plugin \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://opencode.ai/install | bash \
@@ -74,7 +84,9 @@ COPY --from=uv /uv /uvx /usr/local/bin/
 
 # Ensure the vscode/devcontainer user has ownership and fix /root traversal
 USER root
-RUN mkdir -p /home/vscode && chown vscode:vscode /home/vscode && chmod 755 /root && git init /root
+RUN groupadd -f docker && usermod -aG docker vscode \
+  && mkdir -p /home/vscode && chown vscode:vscode /home/vscode \
+  && chmod 755 /root && git init /root
 
 USER vscode
 RUN git config --global user.name "vscode" && git config --global user.email "vscode@devcontainer.local"
