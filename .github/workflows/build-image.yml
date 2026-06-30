@@ -13,7 +13,7 @@ env:
 
 jobs:
   build:
-    runs-on: homelab-runner
+    runs-on: [self-hosted, linux]
     permissions:
       contents: read
       packages: write
