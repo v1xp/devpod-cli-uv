@@ -40,6 +40,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
   pass \
   curl \
   git \
+  stow \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://opencode.ai/install | bash \
@@ -53,6 +54,15 @@ RUN LAZYGIT_ARCH="${TARGETARCH}" \
   && tar xf lazygit.tar.gz lazygit \
   && install lazygit /usr/local/bin/ \
   && rm -f lazygit lazygit.tar.gz
+
+# Install act (GitHub Actions local runner)
+ARG ACT_VERSION=0.2.79
+RUN ACT_ARCH="${TARGETARCH}" \
+  && if [ "$ACT_ARCH" = "amd64" ]; then ACT_ARCH="x86_64"; fi \
+  && curl -Lo act.tar.gz "https://github.com/nektos/act/releases/download/v${ACT_VERSION}/act_Linux_${ACT_ARCH}.tar.gz" \
+  && tar xf act.tar.gz act \
+  && install act /usr/local/bin/ \
+  && rm -f act act.tar.gz
 
 # Copy built neovim from builder
 COPY --from=nvim-builder /usr/local/bin/nvim /usr/local/bin/nvim

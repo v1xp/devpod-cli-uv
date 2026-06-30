@@ -3,6 +3,6 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "postCreateCommand": "nvim --version && uv --version && opencode --version && lazygit --version && git config --local --add safe.directory /workspaces/devpods-builds && git remote -v",
+  "postCreateCommand": "nvim --version && uv --version && opencode --version && lazygit --version && act --version && git config --local --add safe.directory /workspaces/devpods-builds && git remote -v",
   "remoteUser": "vscode"
 }
