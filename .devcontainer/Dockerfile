@@ -1,3 +1,5 @@
+FROM ghcr.io/astral-sh/uv:latest AS uv
+
 FROM mcr.microsoft.com/devcontainers/base:ubuntu AS nvim-builder
 
 USER root
@@ -58,7 +60,6 @@ COPY --from=nvim-builder /usr/local/lib/nvim /usr/local/lib/nvim
 COPY --from=nvim-builder /usr/local/share/nvim /usr/local/share/nvim
 
 # Install uv (Astral's ultra-fast Python package manager)
-FROM ghcr.io/astral-sh/uv:latest AS uv
 COPY --from=uv /uv /uvx /usr/local/bin/
 
 # Ensure the vscode/devcontainer user has ownership and fix /root traversal
