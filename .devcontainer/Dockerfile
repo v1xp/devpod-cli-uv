@@ -20,13 +20,19 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
   curl \
   build-essential \
   systemtap-sdt-dev \
-  && NVIM_TAG=$(curl -fsSL https://api.github.com/repos/neovim/neovim/releases/latest | grep '"tag_name"' | cut -d '"' -f 4) \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ARG NVIM_VERSION=stable
+RUN NVIM_TAG="${NVIM_VERSION}" \
+  && if [ "$NVIM_TAG" = "stable" ]; then \
+    NVIM_TAG=$(curl -fsSL https://api.github.com/repos/neovim/neovim/releases/latest | grep '"tag_name"' | cut -d '"' -f 4); \
+  fi \
   && echo "Building Neovim $NVIM_TAG" \
-  && git clone --depth 1 --branch "$NVIM_TAG" https://github.com/neovim/neovim /tmp/neovim \
-  && cd /tmp/neovim \
+  && git clone --depth 1 --branch "$NVIM_TAG" https://github.com/neovim/neovim /tmp/nvim \
+  && cd /tmp/nvim \
   && make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=/usr/local \
   && make install \
-  && rm -rf /tmp/neovim
+  && rm -rf /tmp/nvim
 
 # --- Final stage ---
 FROM mcr.microsoft.com/devcontainers/base:ubuntu
@@ -43,7 +49,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
   git \
   stow \
   ca-certificates \
-  curl \
   gnupg \
   lsb-release \
   && install -m 0755 -d /etc/apt/keyrings \
@@ -66,7 +71,6 @@ RUN LAZYGIT_ARCH="${TARGETARCH}" \
   && install lazygit /usr/local/bin/ \
   && rm -f lazygit lazygit.tar.gz
 
-# Install act (GitHub Actions local runner)
 ARG ACT_VERSION=0.2.79
 RUN ACT_ARCH="${TARGETARCH}" \
   && if [ "$ACT_ARCH" = "amd64" ]; then ACT_ARCH="x86_64"; fi \
