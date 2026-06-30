@@ -4,11 +4,7 @@
     "dockerfile": "Dockerfile"
   },
   "features": {},
-  "customizations": {
-    "devpod": {
-      "prebuildRepository": "ghcr.io/v1xp/devpod-cli-uv"
-    }
-  },
+  "customizations": {},
   "containerEnv": {
     "GPG_TTY": "/dev/pts/0",
     "GPG_AGENT_INFO": "/home/vscode/.gnupg/S.gpg-agent:0:1"
