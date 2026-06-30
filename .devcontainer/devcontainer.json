@@ -3,16 +3,6 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "features": {},
-  "customizations": {},
-  "containerEnv": {
-    "GPG_TTY": "/dev/pts/0",
-    "GPG_AGENT_INFO": "/home/vscode/.gnupg/S.gpg-agent:0:1"
-  },
-  "mounts": [
-    "source=${localEnv:HOME}/.gnupg,target=/home/vscode/.gnupg,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh-host,type=bind,consistency=cached,readonly"
-  ],
-  "postCreateCommand": "git config --local --add safe.directory /workspaces/devpods-builds && git remote -v",
+  "postCreateCommand": "nvim --version && uv --version && opencode --version && lazygit --version && git config --local --add safe.directory /workspaces/devpods-builds && git remote -v",
   "remoteUser": "vscode"
 }
