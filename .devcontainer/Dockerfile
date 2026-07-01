@@ -1,6 +1,6 @@
-FROM ghcr.io/astral-sh/uv:latest AS uv
+FROM ghcr.io/astral-sh/uv:0.5 AS uv
 
-FROM mcr.microsoft.com/devcontainers/base:ubuntu AS nvim-builder
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04 AS nvim-builder
 
 USER root
 
@@ -35,7 +35,7 @@ RUN NVIM_TAG="${NVIM_VERSION}" \
   && rm -rf /tmp/nvim
 
 # --- Final stage ---
-FROM mcr.microsoft.com/devcontainers/base:ubuntu
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
 USER root
 

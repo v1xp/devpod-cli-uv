@@ -7,12 +7,16 @@ on:
       - ".devcontainer/**"
   workflow_dispatch:
 
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-nvim:
+  build:
     runs-on: [self-hosted, linux]
     permissions:
       contents: read
@@ -30,36 +34,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Build nvim-builder stage
-        uses: docker/build-push-action@v6
-        with:
-          context: .devcontainer
-          file: .devcontainer/Dockerfile
-          target: nvim-builder
-          push: false
-          load: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nvim-builder
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nvim-cache
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nvim-cache,mode=max
-
-  build-final:
-    runs-on: [self-hosted, linux]
-    needs: build-nvim
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: docker/setup-qemu-action@v3
-
-      - uses: docker/setup-buildx-action@v3
-
-      - uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
+      - name: Generate cache key
+        id: cache-key
+        run: |
+          HASH=$(sha256sum .devcontainer/Dockerfile | cut -d' ' -f1 | head -c 12)
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
 
       - uses: docker/metadata-action@v5
         id: meta
@@ -67,9 +46,10 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest
+            type=raw,value=latest-arm,enable=${{ github.event_name == 'push' }}
             type=sha,prefix=
 
-      - name: Build and push final image
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .devcontainer
@@ -77,7 +57,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: |
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nvim-cache
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          cache-from: type=gha,scope=${{ steps.cache-key.outputs.hash }}
+          cache-to: type=gha,mode=max,scope=${{ steps.cache-key.outputs.hash }}
