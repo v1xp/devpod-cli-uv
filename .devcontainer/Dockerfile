@@ -51,6 +51,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
   ca-certificates \
   gnupg \
   lsb-release \
+  linux-perf \
   && install -m 0755 -d /etc/apt/keyrings \
   && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
   && chmod a+r /etc/apt/keyrings/docker.gpg \
@@ -71,7 +72,7 @@ RUN LAZYGIT_ARCH="${TARGETARCH}" \
   && install lazygit /usr/local/bin/ \
   && rm -f lazygit lazygit.tar.gz
 
-ARG ACT_VERSION=0.2.79
+ARG ACT_VERSION=0.2.89
 RUN ACT_ARCH="${TARGETARCH}" \
   && if [ "$ACT_ARCH" = "amd64" ]; then ACT_ARCH="x86_64"; fi \
   && curl -Lo act.tar.gz "https://github.com/nektos/act/releases/download/v${ACT_VERSION}/act_Linux_${ACT_ARCH}.tar.gz" \
