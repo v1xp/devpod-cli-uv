@@ -87,6 +87,9 @@ COPY --from=nvim-builder /usr/local/share/nvim /usr/local/share/nvim
 # Install uv (Astral's ultra-fast Python package manager)
 COPY --from=uv /uv /uvx /usr/local/bin/
 
+# Install graphify (knowledge graph for codebases) via uv
+RUN uv tool install graphifyy
+
 # Ensure the vscode/devcontainer user has ownership and fix /root traversal
 USER root
 RUN groupadd -f docker && usermod -aG docker vscode \
